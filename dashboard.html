@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><title>Dashboard AWA</title></head>
+<body>
+  <h1>Commandes reçues</h1>
+  <ul id="orders"></ul>
+  <script>
+    fetch('/orders').then(res => res.json()).then(data => {
+      const ul = document.getElementById('orders');
+      data.forEach(order => {
+        const li = document.createElement('li');
+        li.textContent = `${order.email} - ${order.items.join(', ')}`;
+        ul.appendChild(li);
+      });
+    });
+  </script>
+</body>
+</html>

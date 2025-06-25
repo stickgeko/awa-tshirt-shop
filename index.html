@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AWA - Boutique de T-shirts</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #6a0dad;
+      color: white;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    nav {
+      background-color: #333;
+      padding: 1rem;
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      transition: color 0.3s;
+    }
+    nav a:hover {
+      color: #ffa500;
+    }
+    section {
+      display: none;
+      padding: 2rem;
+      animation: fadeIn 0.8s ease-in-out;
+    }
+    section.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .product {
+      background: white;
+      padding: 1rem;
+      margin: 1rem auto;
+      max-width: 400px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    button {
+      background-color: #ff0077;
+      border: none;
+      color: white;
+      padding: 0.5rem 1rem;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #e6006a;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>AWA - Boutique de T-shirts</h1>
+  </header>
+
+  <nav>
+    <a href="#" onclick="switchSection('home')">Accueil</a>
+    <a href="#" onclick="switchSection('shop')">Boutique</a>
+    <a href="#" onclick="switchSection('contact')">Contact</a>
+  </nav>
+
+  <section id="home" class="active">
+    <h2>Bienvenue chez AWA !</h2>
+    <p id="animated-text">Des t-shirts stylés, pour tous les goûts et toutes les tailles.</p>
+  </section>
+
+  <section id="shop">
+    <div class="product">
+      <h2>T-shirt Classique</h2>
+      <p>20,00 €</p>
+      <button id="checkout-button">Payer avec Stripe</button>
+    </div>
+  </section>
+
+  <section id="contact">
+    <h2>Contact</h2>
+    <p>Envie de nous écrire ? contact@awa-shop.com</p>
+  </section>
+
+  <script src="https://js.stripe.com/v3/"></script>
+  <script>
+    const stripe = Stripe("pk_test_51RdOHYQhNcL5CZDP4f2coZRVnGxJ3AnGw57SmsLkBbxsgJ22F1H9nsOUkdmBEQD55ZSYbapOf2RuiJ8JTF1DAyy900tU2J8sdz");
+
+    document.getElementById("checkout-button").addEventListener("click", () => {
+      fetch("/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: ["T-shirt Classique"] })
+      })
+      .then(res => res.json())
+      .then(data => stripe.redirectToCheckout({ sessionId: data.id }))
+      .catch(err => console.error("Erreur Stripe :", err));
+    });
+
+    function switchSection(id) {
+      document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    const text = "Des t-shirts stylés, pour tous les goûts et toutes les tailles.";
+    let i = 0;
+    function animateText() {
+      const target = document.getElementById("animated-text");
+      if (i <= text.length) {
+        target.innerText = text.slice(0, i);
+        i++;
+        setTimeout(animateText, 40);
+      }
+    }
+    animateText();
+  </script>
+
+</body>
+</html>
